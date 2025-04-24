@@ -16,7 +16,7 @@ library(patchwork)
 library(deSolve)
 
 # load source functions
-source("~/Documents/Papers/Other/Global human population/ms/PNAS/R1/matrixOperators.r")
+source("matrixOperators.r")
 
 # functions
 # beta distribution shape parameter estimator function
@@ -522,7 +522,6 @@ plot(yrs, as.vector(colSums(n.mat)), type = "l",
 
 # export for external plotting
 det.proj.out <- data.frame(year=yrs, N=2*round(as.vector(colSums(n.mat)),0))
-setwd("~/Documents/Biology/Deer/expert witness")
 write.csv(det.proj.out, file="detprojout.csv", row.names=FALSE)
 
 
@@ -608,7 +607,6 @@ par(mfrow=c(1,1))
 
 # export for external plotting
 stoch.proj.out <- data.frame(year=yrs, N=2*round(n.md,0), N.up=2*round(n.up,0), N.lo=2*round(n.lo,0))
-setwd("~/Documents/Biology/Deer/expert witness")
 write.csv(stoch.proj.out, file="stochprojout.csv", row.names=FALSE)
 
 
@@ -703,7 +701,6 @@ par(mfrow=c(1,1))
 
 # export for external plotting
 stochcat.proj.out <- data.frame(year=yrs, N=2*round(n.md,0), N.up=2*round(n.up,0), N.lo=2*round(n.lo,0))
-setwd("~/Documents/Biology/Deer/expert witness")
 write.csv(stochcat.proj.out, file="stochcatprojout.csv", row.names=FALSE)
 
 
@@ -851,7 +848,6 @@ par(mfrow=c(1,1))
 
 # export for external plotting
 stochcatDF.proj.out <- data.frame(year=yrs, N=2*round(n.md,0), N.up=2*round(n.up,0), N.lo=2*round(n.lo,0))
-setwd("~/Documents/Biology/Deer/expert witness")
 write.csv(stochcatDF.proj.out, file="stochcatDFprojout.csv", row.names=FALSE)
 
 
@@ -1011,7 +1007,6 @@ plot4 <- ggplot(harv.tot.sum.prop.df, aes(x=harv.vec, y=harv.tot.sum.prop.md)) +
 gridExtra::grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
 
 ## export for external plotting
-setwd("~/Documents/Biology/Deer/expert witness")
 harvNnProp.proj.out <- data.frame(harv.vec, 2*n.min.md, 2*n.min.up, 2*n.min.lo, n.min.prop.md, n.min.prop.up, n.min.prop.lo)
 write.csv(harvNnProp.proj.out, file="harvNnPropprojout.csv", row.names=FALSE)
 
