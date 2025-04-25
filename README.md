@@ -1,8 +1,8 @@
 # Leslie matrix projection and culling model for feral fallow deer (<em>Dama dama</em>) in South Australia
 <img align="right" src="www/fallowdeerTransp.png" width="200" style="margin-top: 20px">
 <br>
-Professor Corey J. A. Bradshaw<br>
-Global Ecology Laboratory<br>
+Professor <a href="http://www.flinders.edu.au/people/corey.bradshaw">Corey J. A. Bradshaw</a><br>
+<a href="http://globalecologyflinders.com">Global Ecology Laboratory</a><br>
 Flinders University<br>
 April 2025
 
