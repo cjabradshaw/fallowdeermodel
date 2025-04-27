@@ -39,13 +39,12 @@ surv.pred.func <- function(mass) { # mass in grams
 }
 
 
-#########################################################################
+##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## allometric weighting of vital rates from several cervids to estimate
 ## fallow deer vital rates
-
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 ## Longevity parameter setup
-##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # defines parameters related to deer life span & age distribution for population model
 # 'longev' defines maximum lifespan in years
 longev <- 18
@@ -466,21 +465,11 @@ Deq
 Deq.dat <- data.frame(spp=spp.lab, mass=mass.dat$mass, Deq=Deq)
 Deq.dat
 
-## high habitat suitability (> 0.5) cells in SDM prediction
-nhighsuit.cells <- 40180
-cell.dimlon <- 0.008333333333333328014
-cell.size <- (110.574*cell.dimlon)^2
-cell.size
-
-# convert to population size
-curr.pop.Deq <- round(nhighsuit.cells * cell.size * Deq.dat[3,3], 0)
-curr.pop.Deq
-
 ## initial population vector
-curr.pop <- curr.pop.Deq * sex.ratio  # multiply population estimate by sex ratio to get female population
-# create the initial population vector using the stable stage distribution
+curr.pop <- 20000 * 0.861 * sex.ratio # for fallow deer (see main report for justification)
 init.vec <- curr.pop * stable.stage.dist(popmat)
-# Plot the initial population distribution across ages
+
+# plot the initial population distribution across ages
 plot(age.vec, init.vec, xlab = "age (years)", ylab = "Nf", type = "l")  # Line plot of the female population across ages
 
 
@@ -519,10 +508,6 @@ yrs <- seq(yr.now, yr.end, 1)
 plot(yrs, as.vector(colSums(n.mat)), type = "l", 
      xlab = "year", ylab = "Nf", 
      xlim = c(yr.now, yr.end))  # set x-axis limits to projection period
-
-# export for external plotting
-det.proj.out <- data.frame(year=yrs, N=2*round(as.vector(colSums(n.mat)),0))
-write.csv(det.proj.out, file="detprojout.csv", row.names=FALSE)
 
 
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -604,11 +589,6 @@ plot(age.vec,m.md,type="l", main = "", xlab="age", ylab="m", lwd=2, ylim=c(0.95*
 lines(age.vec,m.lo,lty=2,col="red",lwd=1.5)
 lines(age.vec,m.up,lty=2,col="red",lwd=1.5)
 par(mfrow=c(1,1))
-
-# export for external plotting
-stoch.proj.out <- data.frame(year=yrs, N=2*round(n.md,0), N.up=2*round(n.up,0), N.lo=2*round(n.lo,0))
-write.csv(stoch.proj.out, file="stochprojout.csv", row.names=FALSE)
-
 
 
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -699,31 +679,27 @@ lines(age.vec,m.lo,lty=2,col="red",lwd=1.5)
 lines(age.vec,m.up,lty=2,col="red",lwd=1.5)
 par(mfrow=c(1,1))
 
-# export for external plotting
-stochcat.proj.out <- data.frame(year=yrs, N=2*round(n.md,0), N.up=2*round(n.up,0), N.lo=2*round(n.lo,0))
-write.csv(stochcat.proj.out, file="stochcatprojout.csv", row.names=FALSE)
-
-
 
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## stochastic projection with catastrophes and density feedback
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # density feedback on survival
-K.pop <- round(1.5 * curr.pop, 0)  # carrying capacity (e.g., 1.5 times current population)
+K.pop <- 68703 # estimated from species distribution model
 K.pop
 
 # survival multipliers for different population densities
 surv.mult.start <- 1.0
 surv.mult.lo <- 0.997
-surv.mult.mid <- 0.985
-surv.mult.end <- 0.875
+surv.mult.mid <- 0.99
+surv.mult.up <- 0.965
+surv.mult.end <- 0.86
 
-K.lo <- 1.1 * curr.pop
-K.mid <- 1.25 * curr.pop
+K.lo <- 1.15 * curr.pop*2
+K.mid <- 1.3 * curr.pop*2
+K.up <- 1.6 * curr.pop*2
 
-# Survival multipliers based on population sizes
-K.vec <- c(curr.pop,K.lo,K.mid,K.pop)
-surv.mult.vec <- c(surv.mult.start, surv.mult.lo, surv.mult.mid, surv.mult.end)
+K.vec <- c(2*curr.pop,K.lo,K.mid,K.up,K.pop/2)
+surv.mult.vec <- c(surv.mult.start, surv.mult.lo, surv.mult.mid, surv.mult.up, surv.mult.end)
 plot(K.vec, surv.mult.vec, pch=19)# Plot the relationship between population size and survival multipliers
 
 ## fit logistic function to survival multipliers based on population size
@@ -760,7 +736,7 @@ iter <- 10000
 itdiv <- iter/10
 cat.pr <- 0.14 # probability of a catastrophe occurring per generation
 yr.now <- 2025  # current year (starting point of the projection)
-yr.end <- 2050  # end year for the projection
+yr.end <- 2060  # end year for the projection
 yrs <- seq(yr.now, yr.end, 1)
 
 t <- (yr.end - yr.now)  # Total number of years to project (e.g., 24 years)
@@ -818,7 +794,7 @@ par(mfrow=c(1,3))
 plot(yrs,n.md,type="l", main = "", xlab="year", ylab="N", lwd=2, ylim=c(0.95*min(n.lo),1.05*max(n.up)))
 lines(yrs,n.lo,lty=2,col="red",lwd=1.5)
 lines(yrs,n.up,lty=2,col="red",lwd=1.5)
-abline(h=K.pop, col="blue", lty=2, lwd=0.9)
+abline(h=K.pop/2, col="blue", lty=2, lwd=0.9)
 
 s.add <- m.add  <- rep(0, stages)
 for (m in 1:iter) {
@@ -846,11 +822,6 @@ lines(age.vec,m.lo,lty=2,col="red",lwd=1.5)
 lines(age.vec,m.up,lty=2,col="red",lwd=1.5)
 par(mfrow=c(1,1))
 
-# export for external plotting
-stochcatDF.proj.out <- data.frame(year=yrs, N=2*round(n.md,0), N.up=2*round(n.up,0), N.lo=2*round(n.lo,0))
-write.csv(stochcatDF.proj.out, file="stochcatDFprojout.csv", row.names=FALSE)
-
-
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## stochastic projection with catastrophes and density feedback,
 ## proportional harvests over 10 years
@@ -866,7 +837,7 @@ yrs <- seq(yr.now, yr.end, 1)
 t <- (yr.end - yr.now)  # Total number of years to project (e.g., 24 years)
 
 ## create proportional harvest vector
-harv.vec <- seq(0, 0.5, 0.05)
+harv.vec <- seq(0, 0.5, 0.02)
 length(harv.vec)
 
 # storage vectors for harvest proportion increment
@@ -932,7 +903,7 @@ for (h in 1:length(harv.vec)) {
   harv.md <- apply(harv.sums.mat, MARGIN=2, median, na.rm=T) # mean over all iterations
   harv.up <- apply(harv.sums.mat, MARGIN=2, quantile, probs=0.975, na.rm=T) # upper over all iterations
   harv.lo <- apply(harv.sums.mat, MARGIN=2, quantile, probs=0.025, na.rm=T) # lower over all iterations
-  
+    
   par(mfrow=c(1,2))
   plot(yrs,n.md,type="l", main = "", xlab="year", ylab="N", lwd=2, ylim=c(0.95*min(n.lo),1.05*max(n.up)))
   lines(yrs,n.lo,lty=2,col="red",lwd=1.5)
@@ -1005,12 +976,3 @@ plot4 <- ggplot(harv.tot.sum.prop.df, aes(x=harv.vec, y=harv.tot.sum.prop.md)) +
   theme_minimal()
 
 gridExtra::grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
-
-## export for external plotting
-harvNnProp.proj.out <- data.frame(harv.vec, 2*n.min.md, 2*n.min.up, 2*n.min.lo, n.min.prop.md, n.min.prop.up, n.min.prop.lo)
-write.csv(harvNnProp.proj.out, file="harvNnPropprojout.csv", row.names=FALSE)
-
-harvTharv.prop.df <- data.frame(harv.vec, 2*harv.tot.sum.md, 2*harv.tot.sum.up, 2*harv.tot.sum.lo,
-                                 harv.tot.sum.prop.md, harv.tot.sum.prop.up, harv.tot.sum.prop.lo)
-write.csv(harvTharv.prop.df, file="harvTharvpropout.csv", row.names=FALSE)
-
